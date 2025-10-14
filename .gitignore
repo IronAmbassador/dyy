@@ -1,5 +1,4 @@
 # Gradle 文件
-gradle/
 build/
 .idea/
 release/
