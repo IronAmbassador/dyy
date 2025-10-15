@@ -65,7 +65,9 @@ public class TabNewsFragment extends Fragment {
 
 
     public static TabNewsFragment newInstance(String param) {
+        // 创建tab实例
         TabNewsFragment fragment = new TabNewsFragment();
+        // 设置参数
         Bundle args = new Bundle();
         args.putString(ARG_PARAM, param);
         fragment.setArguments(args);
@@ -76,6 +78,7 @@ public class TabNewsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            // 获取参数
             title = getArguments().getString(ARG_PARAM);
         }
     }
@@ -83,6 +86,7 @@ public class TabNewsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // item容器列表
         rootView = inflater.inflate(R.layout.fragment_tab_news, container, false);
         recyclerView = rootView.findViewById(R.id.recyclerView);
         return rootView;

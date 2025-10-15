@@ -34,7 +34,7 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.MyHold
     @NonNull
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // 加载布局文件
+        // 加载布局文件 将item子项绑定到RecyclerView上
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_list_item, null);
         return new MyHolder(view);
     }
@@ -71,6 +71,7 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.MyHold
         return mDataDTOList.size();
     }
 
+    // item子布局项
     static class MyHolder extends RecyclerView.ViewHolder {
         ImageView thumbnail_pic_s;
         TextView title;

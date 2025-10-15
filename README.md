@@ -32,6 +32,8 @@ cn.yiiguxing.plugin.translate (3.7.3)
 - 登录界面
 - 顶部多菜单布局
 - 抽屉布局
+- 通过id查找来绑定数据
+- TabLayout与ViewPager2实现：顶部多导航栏，滑动与选择
 
 # 课程来源
 

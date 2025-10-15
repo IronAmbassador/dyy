@@ -67,7 +67,9 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public Fragment createFragment(int position) {
+                // 滑动某一个具体的TabLayout的时候进行创建一个实例
                 String title = titles.get(position).getPy_title();
+                // 初始化展示容器
                 TabNewsFragment tabNewsFragment = TabNewsFragment.newInstance(title);
                 return tabNewsFragment;
             }
@@ -137,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tab_layout, viewPager, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+                // 设置顶部导航栏标题
                 tab.setText(titles.get(position).getTitle());
             }
         });
