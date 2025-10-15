@@ -1,5 +1,6 @@
 package com.white.news.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,7 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.MyHold
         return new MyHolder(view);
     }
 
+    @SuppressLint("RecyclerView")
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
         // 绑定数据
