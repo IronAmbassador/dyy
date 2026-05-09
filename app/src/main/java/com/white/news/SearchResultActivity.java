@@ -53,6 +53,40 @@ public class SearchResultActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 String data = (String) msg.obj;
                 NewsInfo newsInfo = new Gson().fromJson(data, NewsInfo.class);
+                if (newsInfo != null && newsInfo.getError_code() == 0 && newsInfo.getResult() != null && newsInfo.getResult().getData() != null && newsInfo.getResult().getData().size() > 0) {
+                    mNewsListAdapter.setListData(newsInfo.getResult().getData());
+                    tvEmpty.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    if (newsInfo != null && newsInfo.getReason() != null) {
+                        Toast.makeText(SearchResultActivity.this, "搜索失败，显示头条新闻", Toast.LENGTH_SHORT).show();
+                    }
+                    loadTopNews();
+                }
+            } else if (msg.what == 0) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(SearchResultActivity.this, "网络请求失败，显示头条新闻", Toast.LENGTH_SHORT).show();
+                loadTopNews();
+            }
+        }
+    };
+
+    private void loadTopNews() {
+        String url = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=top";
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder().url(url).get().build();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                tvEmpty.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                String data = response.body().string();
+                NewsInfo newsInfo = new Gson().fromJson(data, NewsInfo.class);
                 if (newsInfo != null && newsInfo.getError_code() == 0) {
                     mNewsListAdapter.setListData(newsInfo.getResult().getData());
                     tvEmpty.setVisibility(View.GONE);
@@ -60,17 +94,10 @@ public class SearchResultActivity extends AppCompatActivity {
                 } else {
                     tvEmpty.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
-                    if (newsInfo != null && newsInfo.getReason() != null) {
-                        Toast.makeText(SearchResultActivity.this, newsInfo.getReason(), Toast.LENGTH_SHORT).show();
-                    }
                 }
-            } else if (msg.what == 0) {
-                progressBar.setVisibility(View.GONE);
-                tvEmpty.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
             }
-        }
-    };
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +191,7 @@ public class SearchResultActivity extends AppCompatActivity {
             encodedKeyword = keyword;
         }
 
-        String searchUrl = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=top&page=1&page_size=20";
+        String searchUrl = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=search&keyword=" + encodedKeyword;
 
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(searchUrl).get().build();
