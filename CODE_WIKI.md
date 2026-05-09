@@ -32,7 +32,8 @@ com.white.news/
 │   ├── NewsDetailsActivity.java    # 新闻详情页
 │   ├── HistoryListActivity.java    # 浏览历史页
 │   ├── AboutActivity.java           # 关于页面
-│   └── UpdatePwdActivity.java      # 修改密码页面
+│   ├── UpdatePwdActivity.java       # 修改密码页面
+│   └── SearchResultActivity.java    # 搜索结果页
 │
 ├── Fragment 层
 │   └── TabNewsFragment.java        # 分类新闻列表 Fragment
@@ -68,6 +69,8 @@ private TabLayout tab_layout                      # 顶部标签栏
 private ViewPager2 viewPager                      # 页面切换器
 private NavigationView nav_view                   # 侧边导航栏
 private DrawerLayout drawer_layout                # 抽屉布局
+private EditText et_search                        # 搜索输入框
+private TextView btn_search                       # 搜索按钮
 ```
 
 **新闻分类配置**:
@@ -86,7 +89,7 @@ private DrawerLayout drawer_layout                # 抽屉布局
 | 健康 | jiangkang | 健康新闻 |
 
 **关键方法**:
-- `onCreate()`: 初始化 TabLayout + ViewPager2 联动
+- `onCreate()`: 初始化 TabLayout + ViewPager2 联动，绑定搜索按钮点击事件
 - `onResume()`: 更新用户登录状态显示
 - `onActivityResult()`: 处理密码修改后的回调
 
@@ -145,6 +148,51 @@ private DrawerLayout drawer_layout                # 抽屉布局
 2. 验证新密码和确认密码一致
 3. 调用 UserDbHelper.updatePwd() 更新密码
 ```
+
+#### 1.7 SearchResultActivity
+
+**职责**: 展示新闻搜索结果页面。
+
+**核心成员变量**:
+```java
+private EditText etSearch                           # 搜索输入框
+private TextView btnBack                           # 返回按钮
+private TextView btnSearch                        # 搜索按钮
+private RecyclerView recyclerView                  # 结果列表
+private TextView tvEmpty                           # 空状态提示
+private ProgressBar progressBar                     # 加载进度
+private NewsListAdapter mNewsListAdapter           # 列表适配器
+private Handler mHandler                           # UI 线程消息处理
+```
+
+**核心逻辑**:
+```
+1. 从 Intent 获取搜索关键词
+2. 对关键词进行 URL 编码
+3. 调用聚合搜索 API (type=search&word=关键词)
+4. 异步请求获取搜索结果
+5. 通过 Handler 切换到主线程
+6. 展示搜索结果或空状态提示
+```
+
+**关键方法**:
+- `performSearch(String keyword)`: 执行搜索请求
+- `initRecyclerView()`: 初始化 RecyclerView 适配器
+- `initListeners()`: 初始化按钮点击和键盘搜索事件监听
+
+**API 调用**:
+```
+URL: http://v.juhe.cn/toutiao/index?key={key}&type=search&word={encodedKeyword}
+参数:
+- key: API 密钥
+- type: 固定为 "search"
+- word: URL 编码后的搜索关键词
+```
+
+**交互方式**:
+- 点击搜索按钮触发搜索
+- 键盘输入框按搜索键触发搜索
+- 点击列表项跳转到新闻详情页
 
 ---
 

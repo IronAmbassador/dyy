@@ -27,13 +27,17 @@
             android:layout_height="40dp">
 
             <EditText
+                android:id="@+id/et_search"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@id/btn_search"
                 android:background="@color/white"
                 android:gravity="center_vertical"
                 android:hint="热点搜索"
-                android:paddingLeft="10dp" />
+                android:paddingLeft="10dp"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:singleLine="true" />
 
             <TextView
                 android:id="@+id/btn_search"
