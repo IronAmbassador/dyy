@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.text.TextUtils;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView tv_nickname;
     private ImageView btn_open_drawerLayout;
     private DrawerLayout drawer_layout;
+    private EditText et_search;
+    private TextView btn_search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         drawer_layout = findViewById(R.id.drawer_layout);
         tv_username = nav_view.getHeaderView(0).findViewById(R.id.tv_username);
         tv_nickname = nav_view.getHeaderView(0).findViewById(R.id.tv_nickname);
+        et_search = findViewById(R.id.et_search);
+        btn_search = findViewById(R.id.btn_search);
 
         // viewPager需要设置一个adapter
         viewPager.setAdapter(new FragmentStateAdapter(this) {
@@ -145,6 +151,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
         tabLayoutMediator.attach();
+
+        btn_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String keyword = et_search.getText().toString().trim();
+                if (TextUtils.isEmpty(keyword)) {
+                    Toast.makeText(MainActivity.this, "请输入搜索关键词", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(MainActivity.this, SearchResultActivity.class);
+                    intent.putExtra("keyword", keyword);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     @Override
