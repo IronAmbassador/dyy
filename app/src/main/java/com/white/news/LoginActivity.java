@@ -42,9 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         // 获取传参的数据
         String update_login = getIntent().getStringExtra("login");
         if (update_login != null) {
-            // 游客修改密码
             toolbar.setVisibility(View.VISIBLE);
-            btn_visitor.setVisibility(View.GONE);
         } else {
             toolbar.setVisibility(View.GONE);
         }
