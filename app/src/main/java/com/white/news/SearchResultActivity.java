@@ -2,9 +2,6 @@ package com.white.news;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,8 +21,8 @@ import com.white.news.adapter.NewsListAdapter;
 import com.white.news.entity.NewsInfo;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -44,60 +40,8 @@ public class SearchResultActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     private NewsListAdapter mNewsListAdapter;
-
-    private Handler mHandler = new Handler(Looper.myLooper()) {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            if (msg.what == 1) {
-                progressBar.setVisibility(View.GONE);
-                String data = (String) msg.obj;
-                NewsInfo newsInfo = new Gson().fromJson(data, NewsInfo.class);
-                if (newsInfo != null && newsInfo.getError_code() == 0 && newsInfo.getResult() != null && newsInfo.getResult().getData() != null && newsInfo.getResult().getData().size() > 0) {
-                    mNewsListAdapter.setListData(newsInfo.getResult().getData());
-                    tvEmpty.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                } else {
-                    if (newsInfo != null && newsInfo.getReason() != null) {
-                        Toast.makeText(SearchResultActivity.this, "搜索失败，显示头条新闻", Toast.LENGTH_SHORT).show();
-                    }
-                    loadTopNews();
-                }
-            } else if (msg.what == 0) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(SearchResultActivity.this, "网络请求失败，显示头条新闻", Toast.LENGTH_SHORT).show();
-                loadTopNews();
-            }
-        }
-    };
-
-    private void loadTopNews() {
-        String url = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=top";
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(url).get().build();
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                tvEmpty.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                String data = response.body().string();
-                NewsInfo newsInfo = new Gson().fromJson(data, NewsInfo.class);
-                if (newsInfo != null && newsInfo.getError_code() == 0) {
-                    mNewsListAdapter.setListData(newsInfo.getResult().getData());
-                    tvEmpty.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                } else {
-                    tvEmpty.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                }
-            }
-        });
-    }
+    private List<NewsInfo.ResultDTO.DataDTO> allNewsData = new ArrayList<>();
+    private String currentKeyword = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,9 +57,10 @@ public class SearchResultActivity extends AppCompatActivity {
             String keyword = intent.getStringExtra("keyword");
             if (!TextUtils.isEmpty(keyword)) {
                 etSearch.setText(keyword);
-                performSearch(keyword);
+                currentKeyword = keyword;
             }
         }
+        loadAllNewsData();
     }
 
     private void initViews() {
@@ -155,7 +100,8 @@ public class SearchResultActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String keyword = etSearch.getText().toString().trim();
                 if (!TextUtils.isEmpty(keyword)) {
-                    performSearch(keyword);
+                    currentKeyword = keyword;
+                    filterNewsByKeyword(keyword);
                 } else {
                     Toast.makeText(SearchResultActivity.this, "请输入搜索关键词", Toast.LENGTH_SHORT).show();
                 }
@@ -168,7 +114,8 @@ public class SearchResultActivity extends AppCompatActivity {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String keyword = etSearch.getText().toString().trim();
                     if (!TextUtils.isEmpty(keyword)) {
-                        performSearch(keyword);
+                        currentKeyword = keyword;
+                        filterNewsByKeyword(keyword);
                     } else {
                         Toast.makeText(SearchResultActivity.this, "请输入搜索关键词", Toast.LENGTH_SHORT).show();
                     }
@@ -179,38 +126,84 @@ public class SearchResultActivity extends AppCompatActivity {
         });
     }
 
-    private void performSearch(String keyword) {
+    private void loadAllNewsData() {
         progressBar.setVisibility(View.VISIBLE);
         tvEmpty.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
 
-        String encodedKeyword;
-        try {
-            encodedKeyword = URLEncoder.encode(keyword, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            encodedKeyword = keyword;
+        String[] types = {"top", "guonei", "guoji", "yule", "tiyu"};
+        final int[] count = {0};
+        final int totalTypes = types.length;
+
+        for (String type : types) {
+            String url = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=" + type;
+            OkHttpClient okHttpClient = new OkHttpClient();
+            Request request = new Request.Builder().url(url).get().build();
+            Call call = okHttpClient.newCall(request);
+
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    count[0]++;
+                    if (count[0] >= totalTypes) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setVisibility(View.GONE);
+                                filterNewsByKeyword(currentKeyword);
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    count[0]++;
+                    String data = response.body().string();
+                    NewsInfo newsInfo = new Gson().fromJson(data, NewsInfo.class);
+                    if (newsInfo != null && newsInfo.getError_code() == 0 && newsInfo.getResult() != null && newsInfo.getResult().getData() != null) {
+                        allNewsData.addAll(newsInfo.getResult().getData());
+                    }
+                    if (count[0] >= totalTypes) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setVisibility(View.GONE);
+                                filterNewsByKeyword(currentKeyword);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    private void filterNewsByKeyword(String keyword) {
+        if (allNewsData.isEmpty()) {
+            tvEmpty.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            return;
         }
 
-        String searchUrl = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=search&keyword=" + encodedKeyword;
-
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(searchUrl).get().build();
-        Call call = okHttpClient.newCall(request);
-
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                mHandler.sendEmptyMessage(0);
+        List<NewsInfo.ResultDTO.DataDTO> filteredList = new ArrayList<>();
+        for (NewsInfo.ResultDTO.DataDTO news : allNewsData) {
+            if (news.getTitle() != null && news.getTitle().contains(keyword)) {
+                filteredList.add(news);
+            } else if (news.getAuthor_name() != null && news.getAuthor_name().contains(keyword)) {
+                filteredList.add(news);
+            } else if (news.getCategory() != null && news.getCategory().contains(keyword)) {
+                filteredList.add(news);
             }
+        }
 
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                String data = response.body().string();
-                Message message = new Message();
-                message.what = 1;
-                message.obj = data;
-                mHandler.sendMessage(message);
-            }
-        });
+        if (filteredList.isEmpty()) {
+            tvEmpty.setText("未找到包含 \"" + keyword + "\" 的新闻");
+            tvEmpty.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            mNewsListAdapter.setListData(filteredList);
+            tvEmpty.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 }
