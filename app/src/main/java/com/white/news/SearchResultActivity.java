@@ -60,6 +60,9 @@ public class SearchResultActivity extends AppCompatActivity {
                 } else {
                     tvEmpty.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
+                    if (newsInfo != null && newsInfo.getReason() != null) {
+                        Toast.makeText(SearchResultActivity.this, newsInfo.getReason(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             } else if (msg.what == 0) {
                 progressBar.setVisibility(View.GONE);
@@ -161,7 +164,7 @@ public class SearchResultActivity extends AppCompatActivity {
             encodedKeyword = keyword;
         }
 
-        String searchUrl = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=search&page=1&page_size=20&keyword=" + encodedKeyword;
+        String searchUrl = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=top&page=1&page_size=20";
 
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(searchUrl).get().build();
