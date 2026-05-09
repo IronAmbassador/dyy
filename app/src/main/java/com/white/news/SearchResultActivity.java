@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
@@ -66,7 +67,12 @@ public class SearchResultActivity extends AppCompatActivity {
                 }
             } else if (msg.what == 0) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(SearchResultActivity.this, "网络请求失败", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(SearchResultActivity.this, "网络请求失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }
     };
@@ -102,6 +108,7 @@ public class SearchResultActivity extends AppCompatActivity {
     private void initRecyclerView() {
         mNewsListAdapter = new NewsListAdapter(this);
         recyclerView.setAdapter(mNewsListAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         mNewsListAdapter.setmOnItemClickListener(new NewsListAdapter.onItemClickListener() {
             @Override
@@ -162,7 +169,7 @@ public class SearchResultActivity extends AppCompatActivity {
             encodedKeyword = keyword;
         }
 
-        String searchUrl = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=search&word=" + encodedKeyword;
+        String searchUrl = "http://v.juhe.cn/toutiao/index?key=" + key + "&type=search&page=1&page_size=20&keyword=" + encodedKeyword;
 
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(searchUrl).get().build();
