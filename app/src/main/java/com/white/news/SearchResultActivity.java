@@ -53,27 +53,18 @@ public class SearchResultActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 String data = (String) msg.obj;
                 NewsInfo newsInfo = new Gson().fromJson(data, NewsInfo.class);
-                if (newsInfo != null && newsInfo.getError_code() == 0 && newsInfo.getResult() != null && newsInfo.getResult().getData() != null) {
-                    if (newsInfo.getResult().getData().size() > 0) {
-                        mNewsListAdapter.setListData(newsInfo.getResult().getData());
-                        tvEmpty.setVisibility(View.GONE);
-                        recyclerView.setVisibility(View.VISIBLE);
-                    } else {
-                        tvEmpty.setVisibility(View.VISIBLE);
-                        recyclerView.setVisibility(View.GONE);
-                    }
+                if (newsInfo != null && newsInfo.getError_code() == 0) {
+                    mNewsListAdapter.setListData(newsInfo.getResult().getData());
+                    tvEmpty.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                 } else {
                     tvEmpty.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                 }
             } else if (msg.what == 0) {
                 progressBar.setVisibility(View.GONE);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(SearchResultActivity.this, "网络请求失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                tvEmpty.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
             }
         }
     };
