@@ -95,25 +95,15 @@
             android:text="记住密码" />
 
         <TextView
-            android:id="@+id/btn_register"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="30dp"
-            android:gravity="center"
-            android:text="没有账号？点击这里"
-            android:textColor="#343965"
-            android:textSize="12sp" />
+                android:id="@+id/btn_register"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:text="没有账号？点击这里"
+                android:textColor="#343965"
+                android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/btn_visitor"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="游客登陆"
-            android:textColor="#343965"
-            android:textSize="12sp" />
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.appcompat.widget.LinearLayoutCompat>

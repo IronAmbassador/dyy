@@ -22,7 +22,6 @@ public class LoginActivity extends AppCompatActivity {
     private TextView et_username;
     private TextView et_password;
     private TextView btn_register;
-    private TextView btn_visitor;
     private CheckBox checkbox;
     private SharedPreferences mSharedPreferences;
     private boolean is_login;
@@ -39,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
         et_password = findViewById(R.id.et_password);
         btn_register = findViewById(R.id.btn_register);
         checkbox = findViewById(R.id.checkbox);
-        btn_visitor = findViewById(R.id.btn_visitor);
 
         // 获取传参的数据
         String update_login = getIntent().getStringExtra("login");
@@ -98,13 +96,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // 游客登录
-        btn_visitor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            }
-        });
         // checkbox变化事件
         checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
