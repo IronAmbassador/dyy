@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:text="white构建的关于新闻资讯的APP。"
+            android:text="时闻是一款关于新闻资讯的APP。"
             android:textSize="16dp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
