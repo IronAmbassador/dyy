@@ -13,6 +13,7 @@ import com.white.news.adapter.NewsListAdapter;
 import com.white.news.db.HistoryDbHelper;
 import com.white.news.entity.HistoryInfo;
 import com.white.news.entity.NewsInfo;
+import com.white.news.entity.UserInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +38,15 @@ public class HistoryListActivity extends AppCompatActivity {
         // 设置适配器
         recyclerView.setAdapter(mNewsListAdapter);
 
-        // 获取数据
-        List<HistoryInfo> historyInfoList = HistoryDbHelper.getInstance(this).queryHistoryListData(null);
+        // 获取当前登录用户
+        String username = null;
+        UserInfo userInfo = UserInfo.getsUserInfo();
+        if (userInfo != null) {
+            username = userInfo.getUsername();
+        }
+
+        // 获取数据 - 根据用户查询
+        List<HistoryInfo> historyInfoList = HistoryDbHelper.getInstance(this).queryHistoryListData(username);
         Gson gson = new Gson();
         for (int i = 0; i < historyInfoList.size(); i++) {
             mDataDTOList.add(gson.fromJson(historyInfoList.get(i).getNew_json(), NewsInfo.ResultDTO.DataDTO.class));

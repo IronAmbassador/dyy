@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.gson.Gson;
 import com.white.news.db.HistoryDbHelper;
 import com.white.news.entity.NewsInfo;
+import com.white.news.entity.UserInfo;
 
 
 public class NewsDetailsActivity extends AppCompatActivity {
@@ -34,9 +35,14 @@ public class NewsDetailsActivity extends AppCompatActivity {
             toolbar.setTitle(dataDTO.getTitle());
             mWebView.loadUrl(dataDTO.getUrl());
 
-            // 添加浏览历史
+            // 添加浏览历史 - 使用当前登录用户
+            String username = null;
+            UserInfo userInfo = UserInfo.getsUserInfo();
+            if (userInfo != null) {
+                username = userInfo.getUsername();
+            }
             String s = new Gson().toJson(dataDTO);
-            int row = HistoryDbHelper.getInstance(NewsDetailsActivity.this).addHistory(null, dataDTO.getUniquekey(), s);
+            int row = HistoryDbHelper.getInstance(NewsDetailsActivity.this).addHistory(username, dataDTO.getUniquekey(), s);
         }
 
         // 监听点击事件
