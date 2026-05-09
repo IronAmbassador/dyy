@@ -156,7 +156,7 @@ private TextView btn_search                       # 搜索按钮
 **核心成员变量**:
 ```java
 private EditText etSearch                           # 搜索输入框
-private TextView btnBack                           # 返回按钮
+private ImageView btnBack                          # 返回按钮
 private TextView btnSearch                        # 搜索按钮
 private RecyclerView recyclerView                  # 结果列表
 private TextView tvEmpty                           # 空状态提示

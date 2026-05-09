@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +37,7 @@ import okhttp3.Response;
 public class SearchResultActivity extends AppCompatActivity {
     private String key = "226c6defa51c0f3fc7b9b0e9c7bfe78f";
     private EditText etSearch;
-    private TextView btnBack;
+    private ImageView btnBack;
     private TextView btnSearch;
     private RecyclerView recyclerView;
     private TextView tvEmpty;
