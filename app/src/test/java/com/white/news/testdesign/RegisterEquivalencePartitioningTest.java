@@ -141,20 +141,20 @@ public class RegisterEquivalencePartitioningTest {
 
     /**
      * 无效等价类 IE1: 用户名长度 < 3 位
-     * 预期: 注册失败或系统处理
+     * 预期: 注册失败，返回 -1
      */
     @Test
     public void testRegister_UsernameTooShort() {
         String username = "ab";  // 2位
         String password = "password123";
 
-        // 由于项目代码未做长度验证，这里测试实际行为
         int result = dbHelper.register(username, password);
-        // 实际行为可能成功也可能失败，取决于数据库约束
+        assertEquals("用户名太短应该返回 -1", -1, result);
     }
 
     /**
      * 无效等价类 IE1: 用户名长度 > 16 位
+     * 预期: 注册失败，返回 -1
      */
     @Test
     public void testRegister_UsernameTooLong() {
@@ -162,11 +162,12 @@ public class RegisterEquivalencePartitioningTest {
         String password = "password123";
 
         int result = dbHelper.register(username, password);
-        // 测试实际行为
+        assertEquals("用户名太长应该返回 -1", -1, result);
     }
 
     /**
      * 无效等价类 IE2: 用户名包含特殊字符
+     * 预期: 注册失败，返回 -1
      */
     @Test
     public void testRegister_UsernameSpecialChars() {
@@ -174,11 +175,12 @@ public class RegisterEquivalencePartitioningTest {
         String password = "password123";
 
         int result = dbHelper.register(username, password);
-        // 测试实际行为
+        assertEquals("用户名包含特殊字符应该返回 -1", -1, result);
     }
 
     /**
      * 无效等价类 IE2: 用户名包含空格
+     * 预期: 注册失败，返回 -1
      */
     @Test
     public void testRegister_UsernameWithSpace() {
@@ -186,11 +188,12 @@ public class RegisterEquivalencePartitioningTest {
         String password = "password123";
 
         int result = dbHelper.register(username, password);
-        // 测试实际行为
+        assertEquals("用户名包含空格应该返回 -1", -1, result);
     }
 
     /**
      * 无效等价类 IE3: 密码长度 < 6 位
+     * 预期: 注册失败，返回 -2
      */
     @Test
     public void testRegister_PasswordTooShort() {
@@ -198,11 +201,12 @@ public class RegisterEquivalencePartitioningTest {
         String password = "12345";  // 5位
 
         int result = dbHelper.register(username, password);
-        // 测试实际行为
+        assertEquals("密码太短应该返回 -2", -2, result);
     }
 
     /**
      * 无效等价类 IE3: 密码长度 > 20 位
+     * 预期: 注册失败，返回 -2
      */
     @Test
     public void testRegister_PasswordTooLong() {
@@ -210,12 +214,12 @@ public class RegisterEquivalencePartitioningTest {
         String password = "123456789012345678901";  // 21位
 
         int result = dbHelper.register(username, password);
-        // 测试实际行为
+        assertEquals("密码太长应该返回 -2", -2, result);
     }
 
     /**
      * 无效等价类 IE4: 用户名已存在
-     * 预期: 注册失败
+     * 预期: 注册失败，返回 -3
      */
     @Test
     public void testRegister_UsernameExists() {
@@ -228,11 +232,12 @@ public class RegisterEquivalencePartitioningTest {
 
         // 第二次注册相同用户名
         int secondResult = dbHelper.register(username, password);
-        // 数据库插入失败返回 -1 或异常
+        assertEquals("用户名已存在应该返回 -3", -3, secondResult);
     }
 
     /**
      * 无效等价类 IE5: 用户名为空
+     * 预期: 注册失败，返回 -1
      */
     @Test
     public void testRegister_EmptyUsername() {
@@ -240,11 +245,12 @@ public class RegisterEquivalencePartitioningTest {
         String password = "password123";
 
         int result = dbHelper.register(username, password);
-        // 测试实际行为
+        assertEquals("空用户名应该返回 -1", -1, result);
     }
 
     /**
      * 无效等价类 IE5: 密码为空
+     * 预期: 注册失败，返回 -2
      */
     @Test
     public void testRegister_EmptyPassword() {
@@ -252,64 +258,70 @@ public class RegisterEquivalencePartitioningTest {
         String password = "";
 
         int result = dbHelper.register(username, password);
-        // 测试实际行为
+        assertEquals("空密码应该返回 -2", -2, result);
     }
 
     // ==================== 边界值测试 ====================
 
     /**
      * 边界值测试: 用户名长度 = 2 (小于最小值3)
+     * 预期: 注册失败，返回 -1
      */
     @Test
     public void testRegister_Boundary_UsernameLength2() {
         String username = "ab";
-        int result = dbHelper.register(username, "password");
-        // 测试边界值行为
+        int result = dbHelper.register(username, "password123");
+        assertEquals("用户名长度2应该失败", -1, result);
     }
 
     /**
      * 边界值测试: 用户名长度 = 3 (等于最小值)
+     * 预期: 注册成功
      */
     @Test
     public void testRegister_Boundary_UsernameLength3() {
         String username = "abc";
-        int result = dbHelper.register(username, "password");
+        int result = dbHelper.register(username, "password123");
         assertTrue("用户名长度3应该成功", result > 0);
     }
 
     /**
      * 边界值测试: 用户名长度 = 16 (等于最大值)
+     * 预期: 注册成功
      */
     @Test
     public void testRegister_Boundary_UsernameLength16() {
         String username = "abcdefghijklmnop";
-        int result = dbHelper.register(username, "password");
+        int result = dbHelper.register(username, "password123");
         assertTrue("用户名长度16应该成功", result > 0);
     }
 
     /**
      * 边界值测试: 用户名长度 = 17 (大于最大值)
+     * 预期: 注册失败，返回 -1
      */
     @Test
     public void testRegister_Boundary_UsernameLength17() {
         String username = "abcdefghijklmnopq";
-        int result = dbHelper.register(username, "password");
-        // 测试边界值行为
+        int result = dbHelper.register(username, "password123");
+        assertEquals("用户名长度17应该失败", -1, result);
     }
 
     /**
      * 边界值测试: 密码长度 = 5 (小于最小值6)
+     * 预期: 注册失败，返回 -2
      */
     @Test
     public void testRegister_Boundary_PasswordLength5() {
         String username = "user_pwd5";
         String password = "12345";
         int result = dbHelper.register(username, password);
-        // 测试边界值行为
+        assertEquals("密码长度5应该失败", -2, result);
     }
 
     /**
      * 边界值测试: 密码长度 = 6 (等于最小值)
+     * 预期: 注册成功
      */
     @Test
     public void testRegister_Boundary_PasswordLength6() {
@@ -321,6 +333,7 @@ public class RegisterEquivalencePartitioningTest {
 
     /**
      * 边界值测试: 密码长度 = 20 (等于最大值)
+     * 预期: 注册成功
      */
     @Test
     public void testRegister_Boundary_PasswordLength20() {
@@ -332,12 +345,13 @@ public class RegisterEquivalencePartitioningTest {
 
     /**
      * 边界值测试: 密码长度 = 21 (大于最大值)
+     * 预期: 注册失败，返回 -2
      */
     @Test
     public void testRegister_Boundary_PasswordLength21() {
         String username = "user_pwd21";
         String password = "123456789012345678901";
         int result = dbHelper.register(username, password);
-        // 测试边界值行为
+        assertEquals("密码长度21应该失败", -2, result);
     }
 }

@@ -46,13 +46,109 @@ public class UserDbHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * 用户名最小长度
+     */
+    private static final int MIN_USERNAME_LENGTH = 3;
+
+    /**
+     * 用户名最大长度
+     */
+    private static final int MAX_USERNAME_LENGTH = 16;
+
+    /**
+     * 密码最小长度
+     */
+    private static final int MIN_PASSWORD_LENGTH = 6;
+
+    /**
+     * 密码最大长度
+     */
+    private static final int MAX_PASSWORD_LENGTH = 20;
+
+    /**
+     * 验证用户名格式
+     *
+     * @param username
+     * @return 验证结果码: 0=成功, -1=为空, -2=长度不足, -3=长度过长, -4=包含非法字符
+     */
+    public int validateUsername(String username) {
+        if (username == null || username.isEmpty()) {
+            return -1;
+        }
+        if (username.length() < MIN_USERNAME_LENGTH) {
+            return -2;
+        }
+        if (username.length() > MAX_USERNAME_LENGTH) {
+            return -3;
+        }
+        if (!username.matches("^[a-zA-Z0-9_]+$")) {
+            return -4;
+        }
+        return 0;
+    }
+
+    /**
+     * 验证密码格式
+     *
+     * @param password
+     * @return 验证结果码: 0=成功, -1=为空, -2=长度不足, -3=长度过长
+     */
+    public int validatePassword(String password) {
+        if (password == null || password.isEmpty()) {
+            return -1;
+        }
+        if (password.length() < MIN_PASSWORD_LENGTH) {
+            return -2;
+        }
+        if (password.length() > MAX_PASSWORD_LENGTH) {
+            return -3;
+        }
+        return 0;
+    }
+
+    /**
+     * 检查用户名是否已存在
+     *
+     * @param username
+     * @return true=已存在, false=不存在
+     */
+    @SuppressLint("Range")
+    public boolean isUsernameExists(String username) {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "select username from user_table where username=?";
+        String[] selectionArgs = {username};
+        Cursor cursor = db.rawQuery(sql, selectionArgs);
+        boolean exists = cursor.moveToNext();
+        cursor.close();
+        db.close();
+        return exists;
+    }
+
+    /**
      * 注册用户
      *
      * @param username
      * @param password
-     * @return
+     * @return 注册结果: >0=成功(返回用户ID), -1=用户名验证失败, -2=密码验证失败, -3=用户名已存在
      */
     public int register(String username, String password) {
+        // 验证用户名
+        int usernameResult = validateUsername(username);
+        if (usernameResult != 0) {
+            return -1;
+        }
+
+        // 验证密码
+        int passwordResult = validatePassword(password);
+        if (passwordResult != 0) {
+            return -2;
+        }
+
+        // 检查用户名是否已存在
+        if (isUsernameExists(username)) {
+            return -3;
+        }
+
         // 获取SQLiteDatabase实例
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -68,7 +164,10 @@ public class UserDbHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * 登录  根据用户名查找用户
+     * 登录 - 根据用户名查找用户
+     *
+     * @param username 用户名
+     * @return 用户信息，如果不存在返回 null
      */
     @SuppressLint("Range")
     public UserInfo login(String username) {
@@ -87,6 +186,38 @@ public class UserDbHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return userInfo;
+    }
+
+    /**
+     * 登录验证 - 验证用户名和密码是否正确
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @return 验证结果码: 0=成功, -1=用户名不存在, -2=密码错误, -3=用户名为空, -4=密码为空
+     */
+    public int loginVerify(String username, String password) {
+        // 验证用户名不为空
+        if (username == null || username.isEmpty()) {
+            return -3;
+        }
+
+        // 验证密码不为空
+        if (password == null || password.isEmpty()) {
+            return -4;
+        }
+
+        // 查询用户
+        UserInfo userInfo = login(username);
+        if (userInfo == null) {
+            return -1;
+        }
+
+        // 验证密码
+        if (!password.equals(userInfo.getPassword())) {
+            return -2;
+        }
+
+        return 0;
     }
 
     /**
