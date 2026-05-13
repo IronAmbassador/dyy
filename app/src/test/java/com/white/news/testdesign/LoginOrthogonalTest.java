@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import android.content.Context;
 
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.white.news.db.UserDbHelper;
 import com.white.news.entity.UserInfo;
@@ -15,6 +16,8 @@ import com.white.news.entity.UserInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +53,8 @@ import java.util.List;
  * │ A3  │ B3  │ B1  │ A1  │ → A3B3 (空用户名,空密码)    → 登录失败
  * └─────┴─────┴─────┴─────┘
  */
+@RunWith(AndroidJUnit4.class)
+@Config(sdk = 33)
 public class LoginOrthogonalTest {
     private UserDbHelper dbHelper;
     private Context context;
@@ -60,6 +65,7 @@ public class LoginOrthogonalTest {
     public void setUp() {
         context = ApplicationProvider.getApplicationContext();
         dbHelper = UserDbHelper.getInstance(context);
+        dbHelper.getWritableDatabase().execSQL("DELETE FROM user_table");
 
         // 预先注册一个正确用户
         dbHelper.register(CORRECT_USERNAME, CORRECT_PASSWORD);
