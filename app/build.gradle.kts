@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    jacoco
 }
 
 android {
@@ -24,6 +25,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            isTestCoverageEnabled = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -44,7 +48,12 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.activity)
-    testImplementation(libs.junit)
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:4.11.0")
+    testImplementation("androidx.test.ext:junit:1.1.5")
+    testImplementation("androidx.test:core:1.5.0")
+    testImplementation("androidx.test:rules:1.5.0")
+    testImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
@@ -54,4 +63,42 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     // 网络请求
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+}
+
+tasks.withType<Test> {
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
+// JaCoCo 配置
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+tasks.register("jacocoTestReport", JacocoReport::class) {
+    dependsOn("testDebugUnitTest")
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(false)
+    }
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*"
+    )
+    val debugTree = fileTree("${buildDir}/intermediates/javac/debug") {
+        exclude(fileFilter)
+    }
+    val kotlinDebugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+    executionData.setFrom(files("${buildDir}/jacoco/testDebugUnitTest.exec"))
 }
