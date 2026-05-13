@@ -14,9 +14,14 @@ import com.white.news.entity.HistoryInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.util.List;
 
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = 33)
 public class HistoryDbHelperTest {
     private HistoryDbHelper dbHelper;
     private Context context;
@@ -25,6 +30,12 @@ public class HistoryDbHelperTest {
     public void setUp() {
         context = ApplicationProvider.getApplicationContext();
         dbHelper = HistoryDbHelper.getInstance(context);
+        // 清理数据库
+        try {
+            dbHelper.getWritableDatabase().execSQL("DELETE FROM history_table");
+        } catch (Exception e) {
+            // 忽略
+        }
     }
 
     @After

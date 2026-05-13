@@ -8,8 +8,6 @@ import static org.junit.Assert.assertTrue;
 import android.content.Context;
 
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import com.white.news.db.UserDbHelper;
 import com.white.news.entity.UserInfo;
 
@@ -17,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ import java.util.List;
  * │ A3  │ B3  │ B1  │ A1  │ → A3B3 (空用户名,空密码)    → 登录失败
  * └─────┴─────┴─────┴─────┘
  */
-@RunWith(AndroidJUnit4.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(sdk = 33)
 public class LoginOrthogonalTest {
     private UserDbHelper dbHelper;

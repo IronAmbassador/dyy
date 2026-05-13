@@ -7,15 +7,19 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 import androidx.test.core.app.ApplicationProvider;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
-import java.util.List;
-
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = 33)
 public class UserDbHelperTest {
     private UserDbHelper dbHelper;
     private Context context;
@@ -24,12 +28,24 @@ public class UserDbHelperTest {
     public void setUp() {
         context = ApplicationProvider.getApplicationContext();
         dbHelper = UserDbHelper.getInstance(context);
+        clearDatabase();
     }
 
     @After
     public void tearDown() {
+        clearDatabase();
         if (dbHelper != null) {
             dbHelper.close();
+        }
+    }
+
+    private void clearDatabase() {
+        try {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db.execSQL("DELETE FROM user_table");
+            db.close();
+        } catch (Exception e) {
+            // 忽略清除错误
         }
     }
 
@@ -42,8 +58,8 @@ public class UserDbHelperTest {
 
     @Test
     public void testRegister() {
-        String testUsername = "testuser_" + System.currentTimeMillis();
-        String testPassword = "testpassword123";
+        String testUsername = "testuser";
+        String testPassword = "testpass123";
 
         int result = dbHelper.register(testUsername, testPassword);
         assertTrue("注册应该成功，返回值应大于0", result > 0);
@@ -51,10 +67,11 @@ public class UserDbHelperTest {
 
     @Test
     public void testLogin_Success() {
-        String testUsername = "logintest_" + System.currentTimeMillis();
+        String testUsername = "logintest";
         String testPassword = "password123";
 
-        dbHelper.register(testUsername, testPassword);
+        int registerResult = dbHelper.register(testUsername, testPassword);
+        assertTrue("注册应该成功", registerResult > 0);
 
         var userInfo = dbHelper.login(testUsername);
         assertNotNull("登录成功应该返回用户信息", userInfo);
@@ -64,7 +81,7 @@ public class UserDbHelperTest {
 
     @Test
     public void testLogin_Failure_WrongPassword() {
-        String testUsername = "loginfail_" + System.currentTimeMillis();
+        String testUsername = "loginfail";
         String correctPassword = "correct123";
         String wrongPassword = "wrong123";
 
@@ -83,9 +100,9 @@ public class UserDbHelperTest {
 
     @Test
     public void testUpdatePassword() {
-        String testUsername = "updatetest_" + System.currentTimeMillis();
-        String oldPassword = "oldpassword";
-        String newPassword = "newpassword";
+        String testUsername = "updatetest";
+        String oldPassword = "oldpass123";
+        String newPassword = "newpass123";
 
         dbHelper.register(testUsername, oldPassword);
 
@@ -101,8 +118,8 @@ public class UserDbHelperTest {
 
     @Test
     public void testDeleteUser() {
-        String testUsername = "deletetest_" + System.currentTimeMillis();
-        String testPassword = "deletepassword";
+        String testUsername = "deletetest";
+        String testPassword = "deletepass";
 
         dbHelper.register(testUsername, testPassword);
 

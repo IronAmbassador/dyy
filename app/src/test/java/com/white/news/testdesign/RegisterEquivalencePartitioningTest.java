@@ -8,8 +8,6 @@ import static org.junit.Assert.assertTrue;
 import android.content.Context;
 
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import com.white.news.db.UserDbHelper;
 import com.white.news.entity.UserInfo;
 
@@ -17,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 /**
@@ -35,7 +34,7 @@ import org.robolectric.annotation.Config;
  * │ 用户存在性       │ 用户名不存在                         │ 用户名已存在       │
  * └─────────────────┴────────────────────────────────────┴──────────────────┘
  */
-@RunWith(AndroidJUnit4.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(sdk = 33)
 public class RegisterEquivalencePartitioningTest {
     private UserDbHelper dbHelper;

@@ -20,9 +20,14 @@ import com.white.news.entity.UserInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.util.List;
 
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = 33)
 public class UserFlowIntegrationTest {
     private Context context;
     private UserDbHelper userDbHelper;
@@ -43,6 +48,14 @@ public class UserFlowIntegrationTest {
         testPassword = "flowpassword123";
 
         UserInfo.setsUserInfo(null);
+
+        // 清理数据库
+        try {
+            userDbHelper.getWritableDatabase().execSQL("DELETE FROM user_table");
+            historyDbHelper.getWritableDatabase().execSQL("DELETE FROM history_table");
+        } catch (Exception e) {
+            // 忽略
+        }
     }
 
     @After
