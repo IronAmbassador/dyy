@@ -1,0 +1,93 @@
+digraph WhiteNews_ER_Diagram {
+	dpi=200 rankdir=TB size="10,14"
+	graph [fontname="Microsoft YaHei" fontsize=20 label="WhiteNews新闻应用 E-R图
+实体-联系图" labelloc=t]
+	node [fontname="Microsoft YaHei" fontsize=11]
+	edge [fontname="Microsoft YaHei" fontsize=10]
+	subgraph cluster_user {
+		color="#585CE5" fillcolor="#E8E6FF" fontcolor=white label="用户实体 (User)" style="rounded,filled"
+		user_id [label="user_id
+(PK)" fillcolor="#D4D0F0" shape=ellipse style=filled]
+		username [label="username
+用户名" fillcolor="#D4D0F0" shape=ellipse style=filled]
+		password [label="password
+密码" fillcolor="#D4D0F0" shape=ellipse style=filled]
+		nickname [label="nickname
+昵称" fillcolor="#D4D0F0" shape=ellipse style=filled]
+		create_time [label="create_time
+创建时间" fillcolor="#D4D0F0" shape=ellipse style=filled]
+	}
+	subgraph cluster_news {
+		color="#52C41A" fillcolor="#F6FFED" fontcolor=white label="新闻实体 (News)" style="rounded,filled"
+		uniquekey [label="uniquekey
+(PK)" fillcolor="#B7EB8F" shape=ellipse style=filled]
+		title [label="title
+标题" fillcolor="#B7EB8F" shape=ellipse style=filled]
+		category [label="category
+分类" fillcolor="#B7EB8F" shape=ellipse style=filled]
+		author_name [label="author_name
+作者/来源" fillcolor="#B7EB8F" shape=ellipse style=filled]
+		date [label="date
+发布日期" fillcolor="#B7EB8F" shape=ellipse style=filled]
+		url [label="url
+原文链接" fillcolor="#B7EB8F" shape=ellipse style=filled]
+		thumbnail [label="thumbnail
+缩略图" fillcolor="#B7EB8F" shape=ellipse style=filled]
+		content [label="content
+正文内容" fillcolor="#B7EB8F" shape=ellipse style=filled]
+	}
+	subgraph cluster_history {
+		color="#FA8C16" fillcolor="#FFF7E6" fontcolor=white label="历史记录实体 (History)" style="rounded,filled"
+		history_id [label="history_id
+(PK)" fillcolor="#FFD591" shape=ellipse style=filled]
+		view_time [label="view_time
+浏览时间" fillcolor="#FFD591" shape=ellipse style=filled]
+	}
+	subgraph cluster_category {
+		color="#1890FF" fillcolor="#E6F7FF" fontcolor=white label="新闻分类实体 (Category)" style="rounded,filled"
+		category_id [label="category_id
+(PK)" fillcolor="#91D5FF" shape=ellipse style=filled]
+		category_name [label="category_name
+分类名称" fillcolor="#91D5FF" shape=ellipse style=filled]
+		category_code [label="category_code
+API参数" fillcolor="#91D5FF" shape=ellipse style=filled]
+		description [label="description
+分类描述" fillcolor="#91D5FF" shape=ellipse style=filled]
+	}
+	user_id -> history_id [label=1 color="#FA8C16" fontsize=10]
+	history_id -> user_id [label="N
+浏览" color="#FA8C16" fontsize=10]
+	history_id -> uniquekey [label=N color="#52C41A" fontsize=10]
+	uniquekey -> history_id [label="1
+记录" color="#52C41A" fontsize=10]
+	uniquekey -> category_id [label=N color="#1890FF" fontsize=10]
+	category_id -> uniquekey [label="1
+属于" color="#1890FF" fontsize=10]
+	user -> user_id [color=gray style=dashed]
+	user -> username [color=gray style=dashed]
+	user -> password [color=gray style=dashed]
+	user -> nickname [color=gray style=dashed]
+	user -> create_time [color=gray style=dashed]
+	news -> uniquekey [color=gray style=dashed]
+	news -> title [color=gray style=dashed]
+	news -> category [color=gray style=dashed]
+	news -> author_name [color=gray style=dashed]
+	news -> date [color=gray style=dashed]
+	news -> url [color=gray style=dashed]
+	news -> thumbnail [color=gray style=dashed]
+	news -> content [color=gray style=dashed]
+	history -> history_id [color=gray style=dashed]
+	history -> view_time [color=gray style=dashed]
+	category -> category_id [color=gray style=dashed]
+	category -> category_name [color=gray style=dashed]
+	category -> category_code [color=gray style=dashed]
+	category -> description [color=gray style=dashed]
+	user [label="用户
+(User)" color="#585CE5" fillcolor="#F0F0F0" shape=rectangle style="rounded,filled"]
+	news [label="新闻
+(News)" color="#52C41A" fillcolor="#F0F0F0" shape=rectangle style="rounded,filled"]
+	history [label="历史记录
+(History)" color="#FA8C16" fillcolor="#F0F0F0" shape=rectangle style="rounded,filled"]
+	category [label="新闻分类
+(Category)" color="#1890FF" fillcolor="#F0F0F0" shape=rectangle style="rounded,filled"]
+}
